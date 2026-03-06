@@ -152,6 +152,3 @@ yc = AddSection(pdf, "Top 3 Clients", yc, clientsData)
 #page footer
 AddFooter(pdf, H, 1)
 
-#save
-pdf.save()
-

@@ -1,6 +1,7 @@
 from time import strftime
-from reportlab import colors
+from reportlab.lib import colors
 from reportlab.lib import styles
+from reportlab.lib import pagesizes
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -46,15 +47,16 @@ subtitle_style = ParagraphStyle(
     'CustomSubtitle',
     parent=styles['Heading2'],
     fontSize=16,
-    textColor=12,
-    fontName='Helvetica.Bold'
+    textColor=prim_color,
+    spaceAfter=12,
+    fontName='Helvetica-Bold'
 )
 
 normal_style = ParagraphStyle(
     'CustomNormal',
     parent=styles['Normal'],
     fontSize=11,
-    textColor=colors.Hexcolor('#2C3E50'),
+    textColor=colors.HexColor('#2C3E50'),
     alignment=TA_JUSTIFY,
     spaceAfter=12
 )
@@ -69,9 +71,9 @@ def create_sales_graph():
     sales = [50000, 45000, 30000]
     bar_color = ['#2E5090', '#7FB3D5', '#E74C3C']
 
-    fig, ax = plt.subplot(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.bar(products, sales, color=bar_color)
-    ax.set_ylabel('sales ($)', fontsize=12, fontweigth='bold')
+    ax.set_ylabel('sales ($)', fontsize=12, fontweight='bold')
     ax.set_title('sales by product', fontsize=14, fontweight='bold')
 
     #add values on the bars
@@ -79,7 +81,7 @@ def create_sales_graph():
         ax.text(i, v + 1000, f'${v:,}', ha='center', va='bottom', fontweight='bold')
 
     plt.tight_layout()
-    DIR_imgGraph = OUTPUT_DIR + "/sales_graph.png"
+    DIR_imgGraph = OUTPUT_DIR / "sales_graph.png"
     plt.savefig(DIR_imgGraph, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -112,7 +114,7 @@ def add_heading(canvas, doc):
     )
 
     canvas.setFont('Helvetica', 10)
-    canvas.srawSting(
+    canvas.drawString(
         doc.leftMargin,
         doc.height + doc.height + doc.topMargin + 30,
         f"Generated: {datetime.now().strftime('%d/%m%Y %H:%M')}"
@@ -140,7 +142,7 @@ def create_sales_table():
     ]
 
     #createtable object
-    table = Table(data, coloWidths=[2*inch, 1*inch, 1.2*inch, 1.2*inch, 1*inch])
+    table = Table(data, colWidths=[2*inch, 1*inch, 1.2*inch, 1.2*inch, 1*inch])
 
     table_style = TableStyle([
         #heading (row0)
@@ -175,4 +177,157 @@ def create_sales_table():
     table.setStyle(table_style)
     return table
 
+def createClientsTable():
     
+    data = [
+        ['Ranking', 'Cliente', 'Total sales', 'State'],
+        ['1', 'ABC corporation', '$25,000', 'Active'],
+        ['2', 'XYZ industries', '$18,000', 'Active'],
+        ['3', 'Global tech Ltd', '$15,000', 'Active'],
+        ['4', 'Innovate solutions', '$12,000', 'Pending'],
+        ['5', 'Tech Dynamics', '$10,000', 'Active'],
+    ]
+
+    table = Table(data, colWidths=[0.8*inch, 2.5*inch, 1.5*inch, 1.2*inch])
+
+    table_style = TableStyle([
+        #heading
+        ('BACKGROUND', (0,0), (-1,0), accent_color),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('ALIGN', (0,0), (-1,0), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 11),
+
+        #data
+        ('BACKGROUND', (0,1), (-1,-1), accent_color),
+        ('ALIGN', (0,1), (-1,-1), 'CENTER'),
+        ('ALIGN', (2,1), (-1,-1), 'RIGHT'),
+        ('ALIGN', (3,1), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,1), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,1), (-1,-1), 10),
+
+        #border
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.lightgrey]),
+    ])
+
+    table.setStyle(table_style)
+    return table
+
+#create complete report
+
+pdf = SimpleDocTemplate(
+    "ProfessionalPdfDoc.pdf",
+    pagesizes=letter,
+    rightMargin=0.75*inch,
+    leftMargin=0.75*inch,
+    topMargin=1.2*inch,
+    bottomMargin=0.75*inch
+)
+
+#list of elements included in pdf
+elements = []
+
+#Page 1
+
+#principal heading
+title = Paragraph("Monthly sales report", title_style)
+elements.append(title)
+
+subtitle = Paragraph("Complete analysis - January 2026")
+elements.append(subtitle)
+
+elements.append(Spacer(1, 0.3*inch))
+
+# Executive summary
+summarytext = """
+Executive Summary:
+During January, there was a <b>15% increase</b> in total sales 
+compared to the previous month, reaching a total of <b>$125,000</b>. This growth is 
+mainly attributed to the 20% increase in sales of Product C, which has 
+shown a sustained positive trend over the last three months.
+The total number of transactions was <b>45</b>, with an average ticket of <b>$2,777</b>. 
+The top three customers account for 46.8% of total sales, indicating 
+a significant concentration that requires diversification strategies.
+"""
+
+elements.append(Paragraph(summarytext, normal_style))
+
+elements.append(Spacer(1, 0.4*inch))
+
+#table subtitle
+elements.append(Paragraph("Breakdown of Sales by Product", subtitle_style))
+elements.append(Spacer(1, 0.2*inch))
+
+
+#add sales table
+elements.append(create_sales_table())
+
+elements.append(Spacer(1, 0.4*inch))
+
+#page 2
+
+elements.append(PageBreak())
+
+elements.append(Paragraph("Visual sales analysis", subtitle_style))
+elements.append(Spacer(1, 0.2*inch))
+
+#Generate and add graph
+graph_dir = create_sales_graph()
+elements.append(Image(graph_dir, width=5*inch, height=3.3*inch))
+
+elements.append(Spacer(1, 0.3*inch))
+
+#graph analysis
+analysis_text = """
+<b>Executive Summary:</b><br/>
+During January, there was a <b>15% increase</b> in total sales 
+compared to the previous month, reaching a total of <b>$125,000</b>. This growth is 
+mainly attributed to the 20% increase in sales of Product C, which has 
+shown a sustained positive trend over the last three months.
+<br/><br/>
+The total number of transactions was <b>45</b>, with an average ticket of <b>$2,777</b>. 
+The top three customers account for 46.8% of total sales, indicating 
+a significant concentration that requires diversification strategies.
+"""
+
+elements.append(Paragraph(analysis_text, normal_style))
+
+elements.append(Spacer(1, 0.4*inch))
+
+#page 3 
+elements.append(Paragraph("Top 5 costumer of the month", subtitle_style))
+elements.append(Spacer(1, 0.2*inch))
+
+elements.append(createClientsTable())
+
+elements.append(Spacer(1, 0.3*inch))
+
+#recomendations
+elements.append(Paragraph("Strategic recomendations", subtitle_style))
+elements.append(Spacer(1, 0.1*inch))
+
+recomendations_text = """
+<b>1. Customer Diversification:</b> The top three customers account for almost 47% of sales. 
+It is recommended to implement customer acquisition strategies to reduce dependency.<br/><br/>
+
+<b>2. Promote Product C:</b> Take advantage of positive momentum with targeted campaigns 
+and special promotions.<br/><br/>
+
+<b>3. Recovery of Product B:</b> Conduct a detailed analysis of the causes of the decline 
+and adjust the pricing or marketing strategy.<br/><br/>
+
+<b>4. Loyalty:</b> Implement a loyalty program for active customers and recover 
+those in pending status.
+"""
+
+elements.append(Paragraph(recomendations_text, normal_style))
+
+# build pdf
+
+pdf.build(elements, onFirstPage=add_heading, onLaterPages=add_heading)
+
+pdf.save()
+
+print("✅ PDF nivel 3 creado: reporte_nivel3.pdf")
+print("✅ Gráfico generado: grafico_ventas.png")
