@@ -143,7 +143,7 @@ def create_sales_table():
     ]
 
     #createtable object
-    table = Table(data, colWidths=[2*inch, 1*inch, 1.2*inch, 1.2*inch, 1*inch])
+    table = Table(data, colWidths=[1*inch, 1*inch, 1.2*inch, 1.2*inch, 1*inch])
 
     table_style = TableStyle([
         #heading (row0)
