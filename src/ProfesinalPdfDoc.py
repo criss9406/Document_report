@@ -1,4 +1,3 @@
-from time import strftime
 from reportlab.lib import colors
 from reportlab.lib import styles
 from reportlab.lib import pagesizes
@@ -6,8 +5,8 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import (SimpleDocTemplate, Table, TableStyle, Paragraph,
-                                Spacer, PageBreak, Image, tables)
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_RIGHT 
+                                Spacer, PageBreak, Image)
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.colors import HexColor
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -98,7 +97,7 @@ def add_heading(canvas, doc):
     canvas.setFillColor(prim_color)
     canvas.rect(
         0, 
-        doc.height + doc.topMargin + 20,
+        doc.height + doc.topMargin,
         doc.width + 2*doc.leftMargin, 
         60,
         fill=True,
@@ -106,17 +105,17 @@ def add_heading(canvas, doc):
     )
 
     canvas.setFillColor(colors.white)
-    canvas.setFont('Helvetica-Bold', 16)
+    canvas.setFont('Helvetica-Bold', 20)
     canvas.drawString(
         doc.leftMargin,
-        doc.height + doc.topMargin + 50,
+        doc.height + doc.topMargin + 22,
         "SALES REPORT"
     )
 
     canvas.setFont('Helvetica', 10)
     canvas.drawString(
         doc.leftMargin,
-        doc.height + doc.height + doc.topMargin + 30,
+        doc.height + doc.topMargin + 10,
         f"Generated: {datetime.now().strftime('%d/%m%Y %H:%M')}"
     )
 
@@ -125,10 +124,12 @@ def add_heading(canvas, doc):
     canvas.setFont('Helvetica', 8)
     canvas.drawString(doc.leftMargin, 20, "2026 company_name|confidential")
     canvas.drawString(
-        doc.width + doc.leftMargin -50,
+        doc.width + doc.leftMargin - 50,
         20,
         f"Page {doc.page}"
     )
+
+    canvas.restoreState()
 
 #generate professional table
 def create_sales_table():
@@ -217,7 +218,7 @@ def createClientsTable():
 #create complete report
 
 pdf = SimpleDocTemplate(
-    "ProfessionalPdfDoc.pdf",
+    str(pdf_path),
     pagesizes=letter,
     rightMargin=0.75*inch,
     leftMargin=0.75*inch,
@@ -234,7 +235,7 @@ elements = []
 title = Paragraph("Monthly sales report", title_style)
 elements.append(title)
 
-subtitle = Paragraph("Complete analysis - January 2026")
+subtitle = Paragraph("Complete analysis - January 2026", subtitle_style)
 elements.append(subtitle)
 
 elements.append(Spacer(1, 0.3*inch))
@@ -280,16 +281,13 @@ elements.append(Spacer(1, 0.3*inch))
 
 #graph analysis
 analysis_text = """
-<b>Executive Summary:</b><br/>
-During January, there was a <b>15% increase</b> in total sales 
-compared to the previous month, reaching a total of <b>$125,000</b>. This growth is 
-mainly attributed to the 20% increase in sales of Product C, which has 
-shown a sustained positive trend over the last three months.
-<br/><br/>
-The total number of transactions was <b>45</b>, with an average ticket of <b>$2,777</b>. 
-The top three customers account for 46.8% of total sales, indicating 
-a significant concentration that requires diversification strategies.
+<b>Graph Analysis:</b><br/>
+Product A maintains leadership with $50,000 in sales, representing 40% of the total. 
+However, Product C shows the highest percentage growth (+20%), suggesting 
+an investment opportunity in marketing for this product. Product B experienced 
+a slight decline of 5%, requiring immediate attention to identify causes.
 """
+
 
 elements.append(Paragraph(analysis_text, normal_style))
 
@@ -302,6 +300,8 @@ elements.append(Spacer(1, 0.2*inch))
 elements.append(createClientsTable())
 
 elements.append(Spacer(1, 0.3*inch))
+
+elements.append(PageBreak())
 
 #recomendations
 elements.append(Paragraph("Strategic recomendations", subtitle_style))
@@ -327,7 +327,6 @@ elements.append(Paragraph(recomendations_text, normal_style))
 
 pdf.build(elements, onFirstPage=add_heading, onLaterPages=add_heading)
 
-pdf.save()
 
 print("✅ PDF nivel 3 creado: reporte_nivel3.pdf")
 print("✅ Gráfico generado: grafico_ventas.png")
