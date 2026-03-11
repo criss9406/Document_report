@@ -17,7 +17,7 @@ outputs/
 # ──────────────────────────────────────────────
 # Processed data (regenerable from raw CSVs)
 # ──────────────────────────────────────────────
-src/report_data.json
+src/report_data/
 
 # ──────────────────────────────────────────────
 # Python
