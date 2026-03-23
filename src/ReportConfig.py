@@ -24,14 +24,14 @@ font_office = {
 }
 
 sizes = {
-    'title': '24',
-    'subtitle': '16',
-    'section': '14',
-    'body': '11',
-    'caption': '9',
-    'footer': '8',
-    'table_head': '11',
-    'table_body': '10',
+    'title': 24,
+    'subtitle': 16,
+    'section': 14,
+    'body': 11,
+    'caption': 9,
+    'footer': 8,
+    'table_head': 11,
+    'table_body': 10,
 }
 
 # Report sections

@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from docx import Document
-from docx.shared import Pt, RGBColor, Inches, Cm, RGBcolor, EMULTIHOP
+from docx.shared import Pt, RGBColor, Inches, Cm, RGBColor, Emu
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn, nsdecls
@@ -19,7 +19,7 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 
 def hex_to_rgb(hex_color):
     h = hex_color.lstrip("#")
-    return RGBColor(int(h[0:2]), 16), int(h[2:4], 16), int(h[4:6], 16)
+    return RGBColor(int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
 
 def load_csv_data(filename):
     path = REPORT_DATA_DIR/filename
