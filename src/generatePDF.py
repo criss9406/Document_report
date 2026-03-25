@@ -21,7 +21,7 @@ from reportlab.platypus import (
     Spacer, PageBreak, Image,
 )
 
-from report_config import COLORS, FONTS_PDF, SIZES, REPORT_TITLE, REPORT_SUBTITLE, SECTIONS
+from ReportConfig import colors, fonts_pdf, sizes, report_title, report_subtitle, Sections
 
 # ──────────────────────────────────────────────
 # PATHS
@@ -36,13 +36,13 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 # COLORS
 # ──────────────────────────────────────────────
 
-PRIMARY = HexColor(COLORS["primary"])
-SECONDARY = HexColor(COLORS["secondary"])
-ACCENT = HexColor(COLORS["accent"])
-SUCCESS = HexColor(COLORS["success"])
-DARK_TEXT = HexColor(COLORS["dark_text"])
-LIGHT_BG = HexColor(COLORS["light_bg"])
-BORDER = HexColor(COLORS["border"])
+PRIMARY = HexColor(colors["primary"])
+SECONDARY = HexColor(colors["secondary"])
+ACCENT = HexColor(colors["accent"])
+SUCCESS = HexColor(colors["success"])
+DARK_TEXT = HexColor(colors["dark_text"])
+LIGHT_BG = HexColor(colors["light_bg"])
+BORDER = HexColor(colors["border"])
 
 # ──────────────────────────────────────────────
 # HELPERS
@@ -82,61 +82,61 @@ base_styles = getSampleStyleSheet()
 title_style = ParagraphStyle(
     "CustomTitle",
     parent=base_styles["Heading1"],
-    fontSize=SIZES["title"],
+    fontSize=sizes["title"],
     textColor=PRIMARY,
     spaceAfter=10,
     alignment=TA_CENTER,
-    fontName=FONTS_PDF["heading"],
+    fontName=fonts_pdf["heading"],
 )
 
 subtitle_style = ParagraphStyle(
     "CustomSubtitle",
     parent=base_styles["Heading2"],
-    fontSize=SIZES["subtitle"] - 3,
+    fontSize=sizes["subtitle"] - 3,
     textColor=grey,
     spaceAfter=20,
     alignment=TA_CENTER,
-    fontName=FONTS_PDF["body"],
+    fontName=fonts_pdf["body"],
 )
 
 section_style = ParagraphStyle(
     "SectionHeading",
     parent=base_styles["Heading2"],
-    fontSize=SIZES["section"],
+    fontSize=sizes["section"],
     textColor=PRIMARY,
     spaceBefore=6,
     spaceAfter=10,
-    fontName=FONTS_PDF["heading"],
+    fontName=fonts_pdf["heading"],
 )
 
 body_style = ParagraphStyle(
     "CustomBody",
     parent=base_styles["Normal"],
-    fontSize=SIZES["body"],
+    fontSize=sizes["body"],
     textColor=DARK_TEXT,
     alignment=TA_JUSTIFY,
     spaceAfter=10,
-    fontName=FONTS_PDF["body"],
+    fontName=fonts_pdf["body"],
 )
 
 label_green = ParagraphStyle(
     "LabelGreen",
     parent=base_styles["Normal"],
-    fontSize=SIZES["body"],
+    fontSize=sizes["body"],
     textColor=SUCCESS,
     spaceBefore=14,
     spaceAfter=6,
-    fontName=FONTS_PDF["heading"],
+    fontName=fonts_pdf["heading"],
 )
 
 label_red = ParagraphStyle(
     "LabelRed",
     parent=base_styles["Normal"],
-    fontSize=SIZES["body"],
+    fontSize=sizes["body"],
     textColor=ACCENT,
     spaceBefore=14,
     spaceAfter=6,
-    fontName=FONTS_PDF["heading"],
+    fontName=fonts_pdf["heading"],
 )
 
 
@@ -154,14 +154,14 @@ def build_table(headers, rows, col_widths, highlight_col=None):
         ("BACKGROUND", (0, 0), (-1, 0), PRIMARY),
         ("TEXTCOLOR", (0, 0), (-1, 0), white),
         ("ALIGN", (0, 0), (-1, 0), "CENTER"),
-        ("FONTNAME", (0, 0), (-1, 0), FONTS_PDF["heading"]),
-        ("FONTSIZE", (0, 0), (-1, 0), SIZES["table_head"]),
+        ("FONTNAME", (0, 0), (-1, 0), fonts_pdf["heading"]),
+        ("FONTSIZE", (0, 0), (-1, 0), sizes["table_head"]),
         ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
         ("TOPPADDING", (0, 0), (-1, 0), 8),
 
         # Data rows
-        ("FONTNAME", (0, 1), (-1, -1), FONTS_PDF["body"]),
-        ("FONTSIZE", (0, 1), (-1, -1), SIZES["table_body"]),
+        ("FONTNAME", (0, 1), (-1, -1), fonts_pdf["body"]),
+        ("FONTSIZE", (0, 1), (-1, -1), sizes["table_body"]),
         ("TEXTCOLOR", (0, 1), (-1, -1), DARK_TEXT),
         ("ALIGN", (1, 1), (-1, -1), "CENTER"),
         ("ALIGN", (0, 1), (0, -1), "LEFT"),
@@ -186,7 +186,7 @@ def build_table(headers, rows, col_widths, highlight_col=None):
                 v = float(cell_val.replace("%", "").replace("+", "").replace(",", ""))
                 color = SUCCESS if v < 0 else ACCENT
                 style_cmds.append(("TEXTCOLOR", (highlight_col, i), (highlight_col, i), color))
-                style_cmds.append(("FONTNAME", (highlight_col, i), (highlight_col, i), FONTS_PDF["heading"]))
+                style_cmds.append(("FONTNAME", (highlight_col, i), (highlight_col, i), fonts_pdf["heading"]))
             except ValueError:
                 pass
 
@@ -205,12 +205,12 @@ def build_kpi_row(kpis):
 
     values = [Paragraph(f'<b>{k["value"]}</b>', ParagraphStyle(
         f"kpi_val_{i}", fontSize=16, textColor=PRIMARY, alignment=TA_CENTER,
-        fontName=FONTS_PDF["heading"],
+        fontName=fonts_pdf["heading"],
     )) for i, k in enumerate(kpis)]
 
     labels = [Paragraph(k["label"], ParagraphStyle(
         f"kpi_lbl_{i}", fontSize=8, textColor=grey, alignment=TA_CENTER,
-        fontName=FONTS_PDF["body"],
+        fontName=fonts_pdf["body"],
     )) for i, k in enumerate(kpis)]
 
     table = Table([values, labels], colWidths=[col_w] * n)
@@ -242,8 +242,8 @@ def create_vendor_pie_chart(vendors):
     values.append(others)
 
     colors_list = [
-        COLORS["primary"], COLORS["secondary"], COLORS["accent"],
-        COLORS["success"], "#F39C12", COLORS["border"],
+        colors["primary"], colors["secondary"], colors["accent"],
+        colors["success"], "#F39C12", colors["border"],
     ]
 
     fig, ax = plt.subplots(figsize=(4.5, 3.5))
@@ -276,7 +276,7 @@ def create_rotation_bar_chart(fastest, slowest):
 
     names = fast_names[::-1] + slow_names[::-1]
     vals = fast_vals[::-1] + slow_vals[::-1]
-    bar_colors = [COLORS["success"]] * 5 + [COLORS["accent"]] * 5
+    bar_colors = [colors["success"]] * 5 + [colors["accent"]] * 5
 
     fig, ax = plt.subplots(figsize=(6, 3.5))
     ax.barh(names, vals, color=bar_colors, height=0.6)
@@ -312,10 +312,10 @@ def add_header_footer(canvas, doc):
     canvas.rect(0, doc.height + doc.topMargin, doc.width + 2 * doc.leftMargin, 50, fill=True, stroke=False)
 
     canvas.setFillColor(white)
-    canvas.setFont(FONTS_PDF["heading"], 14)
-    canvas.drawString(doc.leftMargin, doc.height + doc.topMargin + 20, REPORT_TITLE)
+    canvas.setFont(fonts_pdf["heading"], 14)
+    canvas.drawString(doc.leftMargin, doc.height + doc.topMargin + 20, report_title)
 
-    canvas.setFont(FONTS_PDF["body"], 8)
+    canvas.setFont(fonts_pdf["body"], 8)
     canvas.drawRightString(
         doc.width + doc.leftMargin,
         doc.height + doc.topMargin + 20,
@@ -324,7 +324,7 @@ def add_header_footer(canvas, doc):
 
     # Footer
     canvas.setFillColor(grey)
-    canvas.setFont(FONTS_PDF["body"], SIZES["footer"])
+    canvas.setFont(fonts_pdf["body"], sizes["footer"])
     canvas.drawString(doc.leftMargin, 20, "Confidential — Internal Use Only")
     canvas.drawRightString(doc.width + doc.leftMargin, 20, f"Page {doc.page}")
 
@@ -363,12 +363,12 @@ def generate_report():
     # ═══════════════════════════════════════════
 
     elements.append(Spacer(1, 0.2 * inch))
-    elements.append(Paragraph(REPORT_TITLE, title_style))
-    elements.append(Paragraph(REPORT_SUBTITLE, subtitle_style))
+    elements.append(Paragraph(report_title, title_style))
+    elements.append(Paragraph(report_subtitle, subtitle_style))
     elements.append(Spacer(1, 0.2 * inch))
 
     # Section heading
-    elements.append(Paragraph(SECTIONS[0], section_style))
+    elements.append(Paragraph(Sections[0], section_style))
 
     # KPI row
     elements.append(build_kpi_row([
@@ -399,7 +399,7 @@ def generate_report():
     # ═══════════════════════════════════════════
 
     elements.append(PageBreak())
-    elements.append(Paragraph(SECTIONS[1], section_style))
+    elements.append(Paragraph(Sections[1], section_style))
     elements.append(Paragraph("Top 10 stores by end-of-year inventory value:", body_style))
     elements.append(Spacer(1, 0.1 * inch))
 
@@ -432,7 +432,7 @@ def generate_report():
     # ═══════════════════════════════════════════
 
     elements.append(PageBreak())
-    elements.append(Paragraph(SECTIONS[2], section_style))
+    elements.append(Paragraph(Sections[2], section_style))
     elements.append(Paragraph(
         f"The average margin across all products is <b>{es['avg_margin_pct']}%</b>. "
         f"Below are the top and bottom 10 products by margin percentage.",
@@ -459,7 +459,7 @@ def generate_report():
     # ═══════════════════════════════════════════
 
     elements.append(PageBreak())
-    elements.append(Paragraph(SECTIONS[3], section_style))
+    elements.append(Paragraph(Sections[3], section_style))
     elements.append(Paragraph(
         f"Products with the largest decrease in stock are considered fast-moving. "
         f"Those with the largest increase indicate slow rotation or over-purchasing. "
@@ -513,7 +513,7 @@ def generate_report():
     # ═══════════════════════════════════════════
 
     elements.append(PageBreak())
-    elements.append(Paragraph(SECTIONS[4], section_style))
+    elements.append(Paragraph(Sections[4], section_style))
     elements.append(Paragraph(
         f"The company works with <b>{es['total_vendors']} active suppliers</b>. "
         f"Total procurement spend in 2016 was <b>{fmt_dollar(es['total_purchase_spend'])}</b> "
