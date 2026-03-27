@@ -73,7 +73,7 @@ def main():
 
     margins_all = []
     for brand, info in price_map.items():
-        if info["purchase_price"] > 0:
+        if info["purchase_price"] > 0 and info["price"] > 0:
             margin_pct = ((info["price"] - info["purchase_price"]) / info["purchase_price"]) * 100
             margins_all.append(margin_pct)
     avg_margin = round(sum(margins_all) / len(margins_all), 1)
@@ -165,7 +165,7 @@ def main():
 
     margin_rows = []
     for brand, info in price_map.items():
-        if info["purchase_price"] > 0:
+        if info["purchase_price"] > 0 and info["price"] > 0:
             margin_pct = ((info["price"] - info["purchase_price"]) / info["purchase_price"]) * 100
             margin_rows.append({
                 "brand": brand,
